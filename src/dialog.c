@@ -22,10 +22,11 @@ char *ask_for_string(char *title) {
 
   g_signal_connect(entry, "key_press_event", G_CALLBACK(handle_return), dialog);
 
+  char *str = NULL;
   if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
-    return strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+    str = strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
   }
 
   gtk_widget_destroy(dialog);
-  return NULL;
+  return str;
 }
