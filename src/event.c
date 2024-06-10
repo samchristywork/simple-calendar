@@ -1,10 +1,12 @@
 #include <stdlib.h>
 #include <string.h>
+#include <gtk/gtk.h>
 
 #include "event.h"
 
-extern Event *events;
-extern int n_events;
+Event *events = NULL;
+int n_events = 0;
+int selected_event = -1;
 
 void add_event(char *name, DateTime start, Duration duration) {
   if (events == NULL) {
