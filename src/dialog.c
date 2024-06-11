@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 
 gboolean handle_return(GtkWidget *widget, GdkEventKey *event, gpointer data) {
+  (void)widget;
   if (event->keyval == GDK_KEY_Return) {
     gtk_dialog_response(GTK_DIALOG(data), GTK_RESPONSE_OK);
   }

@@ -63,3 +63,39 @@ void serialize_events(char *filename) {
 
   file_contents = read_file(filename);
 }
+
+bool check_modified() {
+  char *new_contents = serialize_events_to_string();
+  bool modified = strcmp(file_contents, new_contents) != 0;
+  free(new_contents);
+  return modified;
+}
+
+void deserialize_events(char *filename) {
+  file_contents = read_file(filename);
+
+  FILE *file = fopen(filename, "r");
+  if (file != NULL) {
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = getline(&line, &len, file)) != -1) {
+      char *start = strtok(line, "	");
+      char *duration = strtok(NULL, "	");
+      char *name = strtok(NULL, "	");
+      name[strlen(name) - 1] = '\0';
+
+      DateTime dt;
+      dt.epoch = atoi(start);
+
+      Duration d;
+      d.seconds = atoi(duration) * 60;
+
+      add_event(name, dt, d);
+    }
+
+    free(line);
+    fclose(file);
+  }
+}
