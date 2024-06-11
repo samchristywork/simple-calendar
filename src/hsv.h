@@ -1,6 +1,9 @@
 #ifndef HSV_H
 #define HSV_H
 
-void hsv_to_rgb(double h, double s, double v, double *r, double *g, double *b);
+#include <gtk/gtk.h>
+
+void cairo_set_source_hsva(cairo_t *cr, double h, double s, double v,
+                           double a);
 
 #endif

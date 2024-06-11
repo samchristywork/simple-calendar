@@ -1,3 +1,5 @@
+#include <gtk/gtk.h>
+
 void hsv_to_rgb(double h, double s, double v, double *r, double *g, double *b) {
   if (s == 0) {
     *r = *g = *b = v;
@@ -46,4 +48,11 @@ void hsv_to_rgb(double h, double s, double v, double *r, double *g, double *b) {
       break;
     }
   }
+}
+
+void cairo_set_source_hsva(cairo_t *cr, double h, double s, double v,
+                           double a) {
+  double r, g, b;
+  hsv_to_rgb(h, s, v, &r, &g, &b);
+  cairo_set_source_rgba(cr, r, g, b, a);
 }
