@@ -44,3 +44,40 @@ void draw_column_header(cairo_t *cr, int i, char *text, char *subtext) {
   cairo_move_to(cr, x, 40);
   cairo_show_text(cr, subtext);
 }
+
+void draw_column_borders(cairo_t *cr, int i) {
+  float column_width = (float)(width - time_column_width) / 7;
+  cairo_set_source_shade(cr, 0.2);
+  cairo_set_line_width(cr, 0.5);
+
+  cairo_move_to(cr, time_column_width + i * column_width, 0);
+  cairo_line_to(cr, time_column_width + i * column_width, height);
+  cairo_stroke(cr);
+
+  cairo_move_to(cr, time_column_width + i * column_width, header_height);
+  cairo_line_to(cr, time_column_width + (i + 1) * column_width, header_height);
+  cairo_stroke(cr);
+}
+
+void draw_column_grids(cairo_t *cr, int i) {
+  float column_width = (float)(width - time_column_width) / 7;
+  float column_height = (float)height - header_height;
+
+  for (int j = 0; j < 24; j++) {
+    int x = time_column_width + i * column_width;
+    int y = header_height + j * column_height / 24;
+
+    cairo_set_source_shade(cr, 0.5);
+    cairo_set_line_width(cr, 0.5);
+    cairo_move_to(cr, x, y);
+    cairo_line_to(cr, x + column_width, y);
+    cairo_stroke(cr);
+
+    y += column_height / 24 / 2;
+    cairo_set_source_shade(cr, 0.8);
+    cairo_set_line_width(cr, 0.5);
+    cairo_move_to(cr, x, y);
+    cairo_line_to(cr, x + column_width, y);
+    cairo_stroke(cr);
+  }
+}
