@@ -1,8 +1,7 @@
-#include <gtk/gtk.h>
 #include <stdbool.h>
 
+#include "column.h"
 #include "draw.h"
-#include "event.h"
 #include "hsv.h"
 
 extern int width;

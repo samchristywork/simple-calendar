@@ -1,8 +1,6 @@
-#include <gtk/gtk.h>
-
+#include "column.h"
 #include "dialog.h"
 #include "draw.h"
-#include "event.h"
 #include "select.h"
 #include "serialization.h"
 
@@ -29,27 +27,26 @@ CellPos get_cell(float x, float y) {
       2 * (y - header_height) / ((float)height - header_height) * 24};
 }
 
-// Refactor with get_event_rect
 int get_event(float x, float y) {
+  float column_width = (float)(width - time_column_width) / 7;
   CellPos c = get_cell(x, y);
   int day_start_time = get_start_of_week() + c.column * 24 * 60 * 60;
-  for (int i = n_events - 1; i >= 0; i--) {
+  for (int i = 0; i < n_events; i++) {
     Event event = events[i];
-
-    int event_start_time = event.start.epoch;
-    if (event_start_time >= day_start_time &&
-        event_start_time < day_start_time + 24 * 60 * 60) {
-      float event_y = (float)(event_start_time - day_start_time) /
-                      (24 * 60 * 60) * (height - header_height);
-      float event_h = (float)event.duration.seconds / (24 * 60 * 60) *
-                      (height - header_height);
-
-      if (y >= event_y + header_height &&
-          y <= event_y + header_height + event_h) {
-        return i;
-      }
+    float column_height = (float)height - header_height;
+    Rect event_rect = get_event_rect(event, column_width, day_start_time,
+                                     column_height, c.column);
+    if (x >= event_rect.x && x <= event_rect.x + event_rect.w &&
+        y >= event_rect.y && y <= event_rect.y + event_rect.h) {
+      return i;
     }
   }
 
   return -1;
+}
+
+      }
+    }
+  }
+
 }
