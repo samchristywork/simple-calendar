@@ -45,8 +45,47 @@ int get_event(float x, float y) {
   return -1;
 }
 
+gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
+  (void)data;
+  if (event->keyval == GDK_KEY_q) {
+    // TODO: Ask if we want to save before quitting
+    gtk_main_quit();
+  } else if (event->keyval == GDK_KEY_Escape) {
+    gtk_main_quit();
+  } else if (event->keyval == GDK_KEY_d) {
+    if (selected_event != -1) {
+      free(events[selected_event].name);
+      for (int i = selected_event; i < n_events - 1; i++) {
+        events[i] = events[i + 1];
+      }
+      n_events--;
+    }
+  } else if (event->keyval == GDK_KEY_s) {
+    serialize_events(filename);
+    gtk_widget_queue_draw(widget);
+  } else if (event->keyval == GDK_KEY_n) {
+    select_next_event(widget);
+  } else if (event->keyval == GDK_KEY_p) {
+    select_previous_event(widget);
+  } else if (event->keyval == GDK_KEY_c) {
+    if (selected_event != -1) {
+      add_event(events[selected_event].name, events[selected_event].start,
+                events[selected_event].duration);
+    }
+  } else if (event->keyval == GDK_KEY_r) {
+    if (selected_event != -1) {
+      char *newName = ask_for_string("New Name");
+      if (newName != NULL) {
+        free(events[selected_event].name);
+        events[selected_event].name = newName;
+        gtk_widget_queue_draw(widget);
       }
     }
+  }
+
+  return FALSE;
+}
+
   }
 
 }
