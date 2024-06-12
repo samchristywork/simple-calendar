@@ -100,3 +100,16 @@ void draw_time_column(cairo_t *cr) {
     cairo_show_text(cr, time);
   }
 }
+
+void draw(cairo_t *cr) {
+  cairo_set_source_shade(cr, 1.0);
+  cairo_paint(cr);
+
+  draw_modified_indicator(cr);
+  draw_time_column(cr);
+  for (int i = 0; i < 7; i++) {
+    draw_column(cr, i);
+  }
+
+  draw_current_time(cr);
+}
