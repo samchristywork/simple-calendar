@@ -81,3 +81,33 @@ void draw_column_grids(cairo_t *cr, int i) {
     cairo_stroke(cr);
   }
 }
+
+void draw_outlined_rectangle(cairo_t *cr, float x, float y, float w, float h) {
+  cairo_set_line_width(cr, 0.5);
+  cairo_rectangle(cr, x, y, w, h);
+  cairo_fill(cr);
+
+  cairo_set_source_shade(cr, 0.3);
+  cairo_rectangle(cr, x, y, w, h);
+  cairo_stroke(cr);
+}
+
+void draw_event(cairo_t *cr, Event event, float column_width,
+                int day_start_time, int column_height, int column) {
+  int event_start_time = event.start.epoch;
+
+  if (event_start_time >= day_start_time &&
+      event_start_time < day_start_time + 24 * 60 * 60) {
+    float y = (float)(event_start_time - day_start_time) / (24 * 60 * 60) *
+              column_height;
+    float h = (float)event.duration.seconds / (24 * 60 * 60) * column_height;
+
+    draw_outlined_rectangle(cr, time_column_width + column * column_width + 5,
+                            y + header_height, column_width - 10, h);
+
+    cairo_set_source_shade(cr, 0.2);
+    cairo_move_to(cr, time_column_width + column * column_width + 10,
+                  y + header_height + 12);
+    cairo_show_text(cr, event.name);
+  }
+}
