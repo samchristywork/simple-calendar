@@ -25,3 +25,11 @@ int get_start_of_week() {
 void cairo_set_source_shade(cairo_t *cr, double shade) {
   cairo_set_source_rgb(cr, shade, shade, shade);
 }
+
+void draw_modified_indicator(cairo_t *cr) {
+  if (check_modified()) {
+    cairo_set_source_rgb(cr, 1.0, 0.7, 0.7);
+    cairo_rectangle(cr, 0, 0, time_column_width, header_height);
+    cairo_fill(cr);
+  }
+}
