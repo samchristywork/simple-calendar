@@ -67,3 +67,36 @@ void draw_current_time(cairo_t *cr) {
   cairo_show_text(cr, time_str);
   free(time_str);
 }
+
+void draw_time_column(cairo_t *cr) {
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                         CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, 10);
+
+  float column_width = time_column_width;
+  float column_height = (float)height - header_height;
+
+  cairo_set_source_shade(cr, 0.9);
+  cairo_rectangle(cr, 0, header_height, column_width, column_height);
+  cairo_fill(cr);
+
+  cairo_set_source_shade(cr, 0.2);
+  cairo_set_line_width(cr, 0.5);
+  for (int i = 0; i < 24; i++) {
+    int x = 0;
+    int y = header_height + i * column_height / 24;
+    cairo_move_to(cr, x, y);
+    cairo_line_to(cr, x + column_width, y);
+    cairo_stroke(cr);
+
+    char time[6];
+    sprintf(time, "%02d:00", i);
+
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, time, &extents);
+
+    cairo_move_to(cr, x + column_width / 2 - extents.width / 2,
+                  y + column_height / 24 / 2 + extents.height / 2);
+    cairo_show_text(cr, time);
+  }
+}
