@@ -75,6 +75,35 @@ int get_event(float x, float y) {
   return -1;
 }
 
+void show_help_menu() {
+  GtkWidget *dialog = gtk_dialog_new_with_buttons(
+      "Help", NULL, GTK_DIALOG_MODAL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+
+  GtkWidget *content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+
+  GtkWidget *table = gtk_table_new(2, 2, FALSE);
+  gtk_container_add(GTK_CONTAINER(content), table);
+
+  GtkWidget *label = gtk_label_new("Keybindings");
+  gtk_table_attach(GTK_TABLE(table), label, 0, 2, 0, 1, GTK_FILL, GTK_FILL, 0,
+                   0);
+
+  int n_bindings = sizeof(bindings) / sizeof(Binding);
+  for (int i = 0; i < n_bindings; i++) {
+    GtkWidget *key = gtk_label_new(gdk_keyval_name(bindings[i].keyval));
+    GtkWidget *description = gtk_label_new(bindings[i].description);
+
+    gtk_table_attach(GTK_TABLE(table), key, 0, 1, i + 1, i + 2, GTK_FILL,
+                     GTK_FILL, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), description, 2, 3, i + 1, i + 2,
+                     GTK_FILL, GTK_FILL, 0, 0);
+  }
+
+  gtk_widget_show_all(dialog);
+  gtk_dialog_run(GTK_DIALOG(dialog));
+  gtk_widget_destroy(dialog);
+}
+
 gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
   (void)data;
   if (event->keyval == GDK_KEY_q) {
