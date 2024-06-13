@@ -73,18 +73,17 @@ char *get_binding(guint keyval) {
     }
   }
 
-  return strdup("Unknown");
+  return strdup("unknown");
 }
 
 int get_event(float x, float y) {
   float column_width = (float)(width - time_column_width) / 7;
   CellPos c = get_cell(x, y);
-  int day_start_time = get_start_of_week() + c.column * 24 * 60 * 60;
   for (int i = 0; i < n_events; i++) {
     Event event = events[i];
     float column_height = (float)height - header_height;
-    Rect event_rect = get_event_rect(event, column_width, day_start_time,
-                                     column_height, c.column);
+    Rect event_rect =
+        get_event_rect(event, column_width, column_height, c.column);
     if (x >= event_rect.x && x <= event_rect.x + event_rect.w &&
         y >= event_rect.y && y <= event_rect.y + event_rect.h) {
       return i;
@@ -164,6 +163,30 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
   return FALSE;
 }
 
+gboolean handle_mouse_press(GtkWidget *widget, GdkEventButton *event,
+                            gpointer data) {
+  (void)data;
+  if (event->button == 1 && event->type == GDK_BUTTON_PRESS) {
+    g_print("Mouse left click at (%f, %f)\n", event->x, event->y);
+    CellPos c = get_cell(event->x, event->y);
+    g_print("Cell: (%d, %d)\n", c.column, c.row);
+
+    int EventIdx = get_event(event->x, event->y);
+    g_print("Event: %d\n", EventIdx);
+    selected_event = EventIdx;
+
+    if (selected_event == -1) {
+      char *name = ask_for_string("Event Name");
+      if (name != NULL) {
+        add_event(name,
+                  (DateTime){get_start_of_week() + c.column * 24 * 60 * 60 +
+                             c.row * 60 * 60 / 2},
+                  (Duration){60 * 60});
+        selected_event = n_events - 1;
+      }
+    }
+
+    gtk_widget_queue_draw(widget);
   }
 
 }
