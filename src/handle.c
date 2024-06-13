@@ -49,12 +49,31 @@ Binding bindings[] = {
     {GDK_KEY_plus, "increase-duration", "Increase Duration"},
     {GDK_KEY_minus, "decrease-duration", "Decrease Duration"},
     {GDK_KEY_r, "rename-event", "Rename Event"},
+    {GDK_KEY_question, "help", "Help"},
 };
 
 CellPos get_cell(float x, float y) {
-  return (CellPos){
-      (x - time_column_width) / ((float)(width - time_column_width) / 7),
-      2 * (y - header_height) / ((float)height - header_height) * 24};
+  CellPos c = {0, 0};
+
+  if (x < time_column_width) {
+    return c;
+  }
+
+  c.column = (x - time_column_width) / ((float)(width - time_column_width) / 7);
+  c.row = 2 * (y - header_height) / ((float)height - header_height) * 24;
+
+  return c;
+}
+
+char *get_binding(guint keyval) {
+  int n_bindings = sizeof(bindings) / sizeof(Binding);
+  for (int i = 0; i < n_bindings; i++) {
+    if (bindings[i].keyval == keyval) {
+      return strdup(bindings[i].name);
+    }
+  }
+
+  return strdup("Unknown");
 }
 
 int get_event(float x, float y) {
