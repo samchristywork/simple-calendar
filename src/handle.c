@@ -137,6 +137,16 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
       }
       n_events--;
     }
+  } else if (event->keyval == GDK_KEY_o) {
+    char *name = ask_for_string("Event Name");
+    if (name != NULL) {
+      add_event(name,
+                (DateTime){
+                    time(NULL) / (60 * 60) * 60 * 60,
+                },
+                (Duration){60 * 60});
+      selected_event = n_events - 1;
+    }
   } else if (event->keyval == GDK_KEY_s) {
     serialize_events(filename);
     gtk_widget_queue_draw(widget);
@@ -144,6 +154,26 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
     select_next_event(widget);
   } else if (event->keyval == GDK_KEY_p) {
     select_previous_event(widget);
+  } else if (event->keyval == GDK_KEY_Up || event->keyval == GDK_KEY_k) {
+    if (selected_event != -1) {
+      events[selected_event].start.epoch -= 60 * 30;
+      gtk_widget_queue_draw(widget);
+    }
+  } else if (event->keyval == GDK_KEY_Down || event->keyval == GDK_KEY_j) {
+    if (selected_event != -1) {
+      events[selected_event].start.epoch += 60 * 30;
+      gtk_widget_queue_draw(widget);
+    }
+  } else if (event->keyval == GDK_KEY_Right || event->keyval == GDK_KEY_l) {
+    if (selected_event != -1) {
+      events[selected_event].start.epoch += 24 * 60 * 60;
+      gtk_widget_queue_draw(widget);
+    }
+  } else if (event->keyval == GDK_KEY_Left || event->keyval == GDK_KEY_h) {
+    if (selected_event != -1) {
+      events[selected_event].start.epoch -= 24 * 60 * 60;
+      gtk_widget_queue_draw(widget);
+    }
   } else if (event->keyval == GDK_KEY_c) {
     if (selected_event != -1) {
       add_event(events[selected_event].name, events[selected_event].start,
