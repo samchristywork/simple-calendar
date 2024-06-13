@@ -21,6 +21,36 @@ typedef struct CellPos {
   int row;
 } CellPos;
 
+typedef struct Binding {
+  guint keyval;
+  char *name;
+  char *description;
+} Binding;
+
+Binding bindings[] = {
+    {GDK_KEY_q, "quit", "Quit"},
+    {GDK_KEY_Escape, "quit", "Quit"},
+    {GDK_KEY_d, "delete-event", "Delete Event"},
+    {GDK_KEY_o, "add-event", "Add Event"},
+    {GDK_KEY_s, "save", "Save"},
+    {GDK_KEY_n, "next-event", "Next Event"},
+    {GDK_KEY_p, "previous-event", "Previous Event"},
+    {GDK_KEY_Up, "up", "Move Event Up"},
+    {GDK_KEY_k, "up", "Move Event Up"},
+    {GDK_KEY_Down, "down", "Move Event Down"},
+    {GDK_KEY_j, "down", "Move Event Down"},
+    {GDK_KEY_Right, "right", "Move Event Right"},
+    {GDK_KEY_l, "right", "Move Event Right"},
+    {GDK_KEY_Left, "left", "Move Event Left"},
+    {GDK_KEY_h, "left", "Move Event Left"},
+    {GDK_KEY_H, "previous-week", "Previous Week"},
+    {GDK_KEY_L, "next-week", "Next Week"},
+    {GDK_KEY_c, "copy-event", "Copy Event"},
+    {GDK_KEY_plus, "increase-duration", "Increase Duration"},
+    {GDK_KEY_minus, "decrease-duration", "Decrease Duration"},
+    {GDK_KEY_r, "rename-event", "Rename Event"},
+};
+
 CellPos get_cell(float x, float y) {
   return (CellPos){
       (x - time_column_width) / ((float)(width - time_column_width) / 7),
