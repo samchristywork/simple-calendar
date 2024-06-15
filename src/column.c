@@ -131,10 +131,52 @@ void draw_event(cairo_t *cr, Event event, int column) {
   draw_event_duration(cr, event, column, column_width, y);
 }
 
+bool check_if_ranges_overlap(int start_time1, int end_time1, int start_time2,
+                             int end_time2) {
+  if (start_time1 >= start_time2 && start_time1 < end_time2) {
+    return true;
+  }
+
+  if (end_time1 > start_time2 && end_time1 <= end_time2) {
+    return true;
+  }
+
+  if (start_time2 >= start_time1 && start_time2 < end_time1) {
+    return true;
+  }
+
+  if (end_time2 > start_time1 && end_time2 <= end_time1) {
+    return true;
+  }
+
+  return false;
+}
+
+int event_has_overlap(int idx) {
+  Event event = events[idx];
+  for (int i = 0; i < n_events; i++) {
+    if (i == idx) {
+      continue;
+    }
+
+    Event other = events[i];
+    int event_start_time = event.start.epoch;
+    int event_end_time = event.start.epoch + event.duration.seconds;
+    int other_start_time = other.start.epoch;
+    int other_end_time = other.start.epoch + other.duration.seconds;
+    if (check_if_ranges_overlap(event_start_time, event_end_time,
+                                other_start_time, other_end_time)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 Rect get_event_rect(Event event, float column_width, int column_height,
                     int column) {
   int event_start_time = event.start.epoch;
 
+  int day_start_time = get_start_of_week() + column * 24 * 60 * 60;
   if (event_start_time >= day_start_time &&
       event_start_time < day_start_time + 24 * 60 * 60) {
     float y = (float)(event_start_time - day_start_time) / (24 * 60 * 60) *
