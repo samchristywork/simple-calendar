@@ -189,6 +189,19 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
       add_event(events[selected_event].name, events[selected_event].start,
                 events[selected_event].duration);
     }
+  } else if (event->keyval == GDK_KEY_plus) {
+    if (selected_event != -1) {
+      events[selected_event].duration.seconds += 60 * 30;
+      gtk_widget_queue_draw(widget);
+    }
+  } else if (event->keyval == GDK_KEY_minus) {
+    if (selected_event != -1) {
+      events[selected_event].duration.seconds -= 60 * 30;
+      if (events[selected_event].duration.seconds < 60 * 30) {
+        events[selected_event].duration.seconds = 60 * 30;
+      }
+      gtk_widget_queue_draw(widget);
+    }
   } else if (event->keyval == GDK_KEY_r) {
     if (selected_event != -1) {
       char *newName = ask_for_string("New Name");
