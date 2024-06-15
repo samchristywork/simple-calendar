@@ -138,7 +138,9 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
         events[i] = events[i + 1];
       }
       n_events--;
+      selected_event = -1;
     }
+    gtk_widget_queue_draw(widget);
   } else if (event->keyval == GDK_KEY_o) {
     char *name = ask_for_string("Event Name");
     if (name != NULL) {
