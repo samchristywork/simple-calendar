@@ -12,7 +12,31 @@ extern int n_events;
 
 char *file_contents = NULL;
 
+bool file_exists(char *filename) {
+  FILE *file = fopen(filename, "r");
+  if (file == NULL) {
+    return false;
+  }
+
+  fclose(file);
+  return true;
+}
+
+void make_file(char *filename) {
+  FILE *file = fopen(filename, "w");
+  if (file == NULL) {
+    printf("Failed to create file.\n");
+    return;
+  }
+
+  fclose(file);
+}
+
 char *read_file(char *filename) {
+  if (!file_exists(filename)) {
+    make_file(filename);
+  }
+
   FILE *file = fopen(filename, "r");
   if (file == NULL) {
     printf("Failed to open file.\n");
@@ -73,6 +97,10 @@ bool check_modified() {
 
 void deserialize_events(char *filename) {
   file_contents = read_file(filename);
+
+  if (file_contents == NULL) {
+    return;
+  }
 
   FILE *file = fopen(filename, "r");
   if (file != NULL) {
