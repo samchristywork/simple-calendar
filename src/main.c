@@ -2,17 +2,46 @@
 #include <gtk/gtk.h>
 #include <stdbool.h>
 
+#include "args.h"
 #include "handle.h"
 #include "serialization.h"
 
-char *filename = "./calendar.txt";
+#define VERSION_STRING "simple-calendar-1.0.0"
+
+#define LICENSE_STRING                                                         \
+  "Copyright (C) 2024 Sam Christy.\n"                                          \
+  "License GPLv3+: GNU GPL version 3 or later "                                \
+  "<http://gnu.org/licenses/gpl.html>\n"                                       \
+  "\n"                                                                         \
+  "This is free software; you are free to change and redistribute it.\n"       \
+  "There is NO WARRANTY, to the extent permitted by law."
 
 time_t current_time = 0;
+char *filename;
 
 int width = 1400;
 int height = 800;
 
 int main(int argc, char *argv[]) {
+  add_arg('f', "filename", "The file to read and write events to",
+          ARG_REQUIRED);
+  add_arg('h', "help", "Show this help message", ARG_NONE);
+  add_arg('v', "version", "Show the version number and license info", ARG_NONE);
+
+  bool help = get_arg_bool(argc, argv, 'h', false);
+  bool version = get_arg_bool(argc, argv, 'v', false);
+  filename = get_arg_string(argc, argv, 'f', "./calendar.txt");
+
+  if (version) {
+    printf("%s\n\n%s\n", VERSION_STRING, LICENSE_STRING);
+    return EXIT_SUCCESS;
+  }
+
+  if (help) {
+    usage(argv[0]);
+    return EXIT_SUCCESS;
+  }
+
   current_time = time(NULL);
 
   deserialize_events(filename);
