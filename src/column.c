@@ -34,13 +34,12 @@ void draw_column_header(cairo_t *cr, int i, char *text, char *subtext) {
   cairo_move_to(cr, x, 22);
   cairo_show_text(cr, text);
 
-  cairo_text_extents(cr, subtext, &extents);
   cairo_set_source_shade(cr, 0.2);
   cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
                          CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(cr, 10);
-  x = time_column_width + i * column_width + column_width / 2 -
-      extents.width / 2;
+  cairo_text_extents(cr, subtext, &extents);
+  x = time_column_width + i * column_width + column_width / 2 - extents.width / 2;
   cairo_move_to(cr, x, 40);
   cairo_show_text(cr, subtext);
 }
