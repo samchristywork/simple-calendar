@@ -1,6 +1,5 @@
 #include <gtk/gtk.h>
 
-#include "draw.h"
 #include "event.h"
 
 extern int selected_event;

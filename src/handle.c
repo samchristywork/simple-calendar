@@ -16,6 +16,8 @@ extern int header_height;
 extern int width;
 extern int height;
 
+extern int week_number;
+
 typedef struct CellPos {
   int column;
   int row;
@@ -174,6 +176,12 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
       events[selected_event].start.epoch -= 24 * 60 * 60;
       gtk_widget_queue_draw(widget);
     }
+  } else if (event->keyval == GDK_KEY_H) {
+    week_number--;
+    gtk_widget_queue_draw(widget);
+  } else if (event->keyval == GDK_KEY_L) {
+    week_number++;
+    gtk_widget_queue_draw(widget);
   } else if (event->keyval == GDK_KEY_c) {
     if (selected_event != -1) {
       add_event(events[selected_event].name, events[selected_event].start,

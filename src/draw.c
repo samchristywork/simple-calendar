@@ -11,6 +11,7 @@ extern int height;
 
 int header_height = 50;
 int time_column_width = 50;
+int week_number = 0;
 
 int get_start_of_week() {
   time_t t = current_time;
@@ -19,7 +20,7 @@ int get_start_of_week() {
   tm.tm_min = 0;
   tm.tm_sec = 0;
   tm.tm_mday -= tm.tm_wday;
-  return mktime(&tm);
+  return mktime(&tm) + week_number * 7 * 24 * 60 * 60;
 }
 
 void cairo_set_source_shade(cairo_t *cr, double shade) {
