@@ -16,7 +16,7 @@ extern int header_height;
 extern int width;
 extern int height;
 
-extern int week_number;
+extern int day_offset;
 
 typedef struct CellPos {
   int column;
@@ -37,14 +37,14 @@ Binding bindings[] = {
     {GDK_KEY_s, "save", "Save"},
     {GDK_KEY_n, "next-event", "Next Event"},
     {GDK_KEY_p, "previous-event", "Previous Event"},
-    {GDK_KEY_Up, "up", "Move Event Up"},
-    {GDK_KEY_k, "up", "Move Event Up"},
-    {GDK_KEY_Down, "down", "Move Event Down"},
+    {GDK_KEY_h, "left", "Move Event Left"},
     {GDK_KEY_j, "down", "Move Event Down"},
-    {GDK_KEY_Right, "right", "Move Event Right"},
+    {GDK_KEY_k, "up", "Move Event Up"},
     {GDK_KEY_l, "right", "Move Event Right"},
     {GDK_KEY_Left, "left", "Move Event Left"},
-    {GDK_KEY_h, "left", "Move Event Left"},
+    {GDK_KEY_Down, "down", "Move Event Down"},
+    {GDK_KEY_Up, "up", "Move Event Up"},
+    {GDK_KEY_Right, "right", "Move Event Right"},
     {GDK_KEY_H, "previous-week", "Previous Week"},
     {GDK_KEY_L, "next-week", "Next Week"},
     {GDK_KEY_c, "copy-event", "Copy Event"},
@@ -97,26 +97,50 @@ int get_event(float x, float y) {
 
 void show_help_menu() {
   GtkWidget *dialog = gtk_dialog_new_with_buttons(
-      "Help", NULL, GTK_DIALOG_MODAL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+      "Help", NULL, GTK_DIALOG_MODAL, "Ok", GTK_RESPONSE_OK, NULL);
 
-  GtkWidget *content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+  GtkGrid *grid = GTK_GRID(gtk_grid_new());
 
-  GtkWidget *table = gtk_table_new(2, 2, FALSE);
-  gtk_container_add(GTK_CONTAINER(content), table);
+  gtk_container_add(
+      GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+      GTK_WIDGET(grid));
 
-  GtkWidget *label = gtk_label_new("Keybindings");
-  gtk_table_attach(GTK_TABLE(table), label, 0, 2, 0, 1, GTK_FILL, GTK_FILL, 0,
-                   0);
+  GtkWidget *description_label = gtk_label_new("Key");
+  GtkWidget *name_label = gtk_label_new("Name");
+  GtkWidget *key_label = gtk_label_new("Key");
+
+  gtk_label_set_xalign(GTK_LABEL(description_label), 0);
+  gtk_label_set_xalign(GTK_LABEL(name_label), 0);
+  gtk_label_set_xalign(GTK_LABEL(key_label), 1);
+
+  PangoAttrList *attr_list = pango_attr_list_new();
+  PangoAttribute *attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
+  attr->start_index = 0;
+  attr->end_index = 3;
+
+  pango_attr_list_insert(attr_list, attr);
+  gtk_label_set_attributes(GTK_LABEL(description_label), attr_list);
+  gtk_label_set_attributes(GTK_LABEL(name_label), attr_list);
+  gtk_label_set_attributes(GTK_LABEL(key_label), attr_list);
+
+  gtk_grid_attach(grid, description_label, 0, 0, 1, 1);
+  gtk_grid_attach(grid, name_label, 1, 0, 1, 1);
+  gtk_grid_attach(grid, key_label, 2, 0, 1, 1);
 
   int n_bindings = sizeof(bindings) / sizeof(Binding);
   for (int i = 0; i < n_bindings; i++) {
-    GtkWidget *key = gtk_label_new(gdk_keyval_name(bindings[i].keyval));
-    GtkWidget *description = gtk_label_new(bindings[i].description);
+    Binding binding = bindings[i];
+    GtkWidget *description = gtk_label_new(binding.description);
+    GtkWidget *label = gtk_label_new(binding.name);
+    GtkWidget *key = gtk_label_new(gdk_keyval_name(binding.keyval));
 
-    gtk_table_attach(GTK_TABLE(table), key, 0, 1, i + 1, i + 2, GTK_FILL,
-                     GTK_FILL, 0, 0);
-    gtk_table_attach(GTK_TABLE(table), description, 2, 3, i + 1, i + 2,
-                     GTK_FILL, GTK_FILL, 0, 0);
+    gtk_label_set_xalign(GTK_LABEL(label), 0);
+    gtk_label_set_xalign(GTK_LABEL(description), 0);
+    gtk_label_set_xalign(GTK_LABEL(key), 1);
+
+    gtk_grid_attach(grid, description, 0, i + 1, 1, 1);
+    gtk_grid_attach(grid, label, 1, i + 1, 1, 1);
+    gtk_grid_attach(grid, key, 2, i + 1, 1, 1);
   }
 
   gtk_widget_show_all(dialog);
@@ -179,10 +203,10 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
       gtk_widget_queue_draw(widget);
     }
   } else if (event->keyval == GDK_KEY_H) {
-    week_number--;
+    day_offset--;
     gtk_widget_queue_draw(widget);
   } else if (event->keyval == GDK_KEY_L) {
-    week_number++;
+    day_offset++;
     gtk_widget_queue_draw(widget);
   } else if (event->keyval == GDK_KEY_c) {
     if (selected_event != -1) {
@@ -211,6 +235,8 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
         gtk_widget_queue_draw(widget);
       }
     }
+  } else if (event->keyval == GDK_KEY_question) {
+    show_help_menu();
   }
 
   return FALSE;

@@ -11,7 +11,7 @@ extern int height;
 
 int header_height = 50;
 int time_column_width = 50;
-int week_number = 0;
+int day_offset = 0;
 
 int get_start_of_week() {
   time_t t = current_time;
@@ -20,7 +20,7 @@ int get_start_of_week() {
   tm.tm_min = 0;
   tm.tm_sec = 0;
   tm.tm_mday -= tm.tm_wday;
-  return mktime(&tm) + week_number * 7 * 24 * 60 * 60;
+  return mktime(&tm) + day_offset * 24 * 60 * 60;
 }
 
 void cairo_set_source_shade(cairo_t *cr, double shade) {
@@ -30,6 +30,10 @@ void cairo_set_source_shade(cairo_t *cr, double shade) {
 void draw_modified_indicator(cairo_t *cr) {
   if (check_modified()) {
     cairo_set_source_rgb(cr, 1.0, 0.7, 0.7);
+    cairo_rectangle(cr, 0, 0, time_column_width, header_height);
+    cairo_fill(cr);
+  } else {
+    cairo_set_source_rgb(cr, 0.7, 1.0, 0.7);
     cairo_rectangle(cr, 0, 0, time_column_width, header_height);
     cairo_fill(cr);
   }
