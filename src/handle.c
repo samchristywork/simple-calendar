@@ -300,3 +300,34 @@ gboolean handle_refresh(gpointer data) {
   gtk_widget_queue_draw(GTK_WIDGET(data));
   return TRUE;
 }
+
+gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data) {
+  (void)data;
+  (void)widget;
+
+  draw(cr);
+
+  return FALSE;
+}
+
+void connect_signals(GtkWidget *window, GtkWidget *drawing_area) {
+  g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(draw_callback),
+                   NULL);
+
+  g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit),
+                   NULL);
+
+  g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(handle_key),
+                   NULL);
+
+  g_signal_connect(G_OBJECT(window), "button-press-event",
+                   G_CALLBACK(handle_mouse_press), NULL);
+
+  g_signal_connect(G_OBJECT(window), "button-release-event",
+                   G_CALLBACK(handle_mouse_release), NULL);
+
+  g_signal_connect(G_OBJECT(window), "motion-notify-event",
+                   G_CALLBACK(handle_mouse_drag), NULL);
+
+  g_timeout_add(1000, handle_refresh, drawing_area);
+}
