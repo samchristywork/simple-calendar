@@ -30,13 +30,19 @@ typedef struct Binding {
 } Binding;
 
 Binding bindings[] = {
-    {GDK_KEY_q, "quit", "Quit"},
-    {GDK_KEY_Escape, "quit", "Quit"},
-    {GDK_KEY_d, "delete-event", "Delete Event"},
+    {0, "", ""},
+    {0, "", "Events"},
     {GDK_KEY_o, "add-event", "Add Event"},
-    {GDK_KEY_s, "save", "Save"},
+    {GDK_KEY_d, "delete-event", "Delete Event"},
     {GDK_KEY_n, "next-event", "Next Event"},
     {GDK_KEY_p, "previous-event", "Previous Event"},
+    {GDK_KEY_c, "copy-event", "Copy Event"},
+    {GDK_KEY_r, "rename-event", "Rename Event"},
+    {GDK_KEY_plus, "increase-duration", "Increase Duration"},
+    {GDK_KEY_minus, "decrease-duration", "Decrease Duration"},
+
+    {0, "", ""},
+    {0, "", "Movement"},
     {GDK_KEY_h, "left", "Move Event Left"},
     {GDK_KEY_j, "down", "Move Event Down"},
     {GDK_KEY_k, "up", "Move Event Up"},
@@ -45,13 +51,15 @@ Binding bindings[] = {
     {GDK_KEY_Down, "down", "Move Event Down"},
     {GDK_KEY_Up, "up", "Move Event Up"},
     {GDK_KEY_Right, "right", "Move Event Right"},
-    {GDK_KEY_H, "previous-week", "Previous Week"},
-    {GDK_KEY_L, "next-week", "Next Week"},
-    {GDK_KEY_c, "copy-event", "Copy Event"},
-    {GDK_KEY_plus, "increase-duration", "Increase Duration"},
-    {GDK_KEY_minus, "decrease-duration", "Decrease Duration"},
-    {GDK_KEY_r, "rename-event", "Rename Event"},
+    {GDK_KEY_H, "previous-day", "Previous Day"},
+    {GDK_KEY_L, "next-day", "Next Day"},
+
+    {0, "", ""},
+    {0, "", "Misc."},
     {GDK_KEY_question, "help", "Help"},
+    {GDK_KEY_q, "quit", "Quit"},
+    {GDK_KEY_Escape, "quit", "Quit"},
+    {GDK_KEY_s, "save", "Save"},
 };
 
 CellPos get_cell(float x, float y) {
@@ -70,6 +78,9 @@ CellPos get_cell(float x, float y) {
 char *get_binding(guint keyval) {
   int n_bindings = sizeof(bindings) / sizeof(Binding);
   for (int i = 0; i < n_bindings; i++) {
+    if (bindings[i].keyval == 0) {
+      continue;
+    }
     if (bindings[i].keyval == keyval) {
       return strdup(bindings[i].name);
     }
@@ -95,37 +106,17 @@ int get_event(float x, float y) {
   return -1;
 }
 
-void show_help_menu() {
+void show_help_dialog() {
   GtkWidget *dialog = gtk_dialog_new_with_buttons(
       "Help", NULL, GTK_DIALOG_MODAL, "Ok", GTK_RESPONSE_OK, NULL);
 
   GtkGrid *grid = GTK_GRID(gtk_grid_new());
 
+  gtk_grid_set_column_spacing(grid, 10);
+
   gtk_container_add(
       GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
       GTK_WIDGET(grid));
-
-  GtkWidget *description_label = gtk_label_new("Key");
-  GtkWidget *name_label = gtk_label_new("Name");
-  GtkWidget *key_label = gtk_label_new("Key");
-
-  gtk_label_set_xalign(GTK_LABEL(description_label), 0);
-  gtk_label_set_xalign(GTK_LABEL(name_label), 0);
-  gtk_label_set_xalign(GTK_LABEL(key_label), 1);
-
-  PangoAttrList *attr_list = pango_attr_list_new();
-  PangoAttribute *attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
-  attr->start_index = 0;
-  attr->end_index = 3;
-
-  pango_attr_list_insert(attr_list, attr);
-  gtk_label_set_attributes(GTK_LABEL(description_label), attr_list);
-  gtk_label_set_attributes(GTK_LABEL(name_label), attr_list);
-  gtk_label_set_attributes(GTK_LABEL(key_label), attr_list);
-
-  gtk_grid_attach(grid, description_label, 0, 0, 1, 1);
-  gtk_grid_attach(grid, name_label, 1, 0, 1, 1);
-  gtk_grid_attach(grid, key_label, 2, 0, 1, 1);
 
   int n_bindings = sizeof(bindings) / sizeof(Binding);
   for (int i = 0; i < n_bindings; i++) {
@@ -134,13 +125,24 @@ void show_help_menu() {
     GtkWidget *label = gtk_label_new(binding.name);
     GtkWidget *key = gtk_label_new(gdk_keyval_name(binding.keyval));
 
+    if (binding.keyval == 0) {
+      PangoAttrList *attr_list = pango_attr_list_new();
+      {
+        PangoAttribute *attr = pango_attr_size_new(16 * PANGO_SCALE);
+        attr->start_index = 0;
+        attr->end_index = strlen(binding.description);
+        pango_attr_list_insert(attr_list, attr);
+      }
+      gtk_label_set_attributes(GTK_LABEL(description), attr_list);
+    }
+
     gtk_label_set_xalign(GTK_LABEL(label), 0);
     gtk_label_set_xalign(GTK_LABEL(description), 0);
-    gtk_label_set_xalign(GTK_LABEL(key), 1);
+    gtk_label_set_xalign(GTK_LABEL(key), 0);
 
-    gtk_grid_attach(grid, description, 0, i + 1, 1, 1);
-    gtk_grid_attach(grid, label, 1, i + 1, 1, 1);
-    gtk_grid_attach(grid, key, 2, i + 1, 1, 1);
+    gtk_grid_attach(grid, description, 0, i, 1, 1);
+    gtk_grid_attach(grid, label, 1, i, 1, 1);
+    gtk_grid_attach(grid, key, 2, i, 1, 1);
   }
 
   gtk_widget_show_all(dialog);
