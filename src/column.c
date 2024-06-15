@@ -94,6 +94,10 @@ void draw_outlined_rectangle(cairo_t *cr, float x, float y, float w, float h) {
 
 void draw_event_name(cairo_t *cr, Event event, int column, float column_width,
                      float y) {
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                         CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, 10);
+
   cairo_set_source_shade(cr, 0.2);
   cairo_move_to(cr, time_column_width + column * column_width + 10,
                 y + header_height + 12);
@@ -102,6 +106,10 @@ void draw_event_name(cairo_t *cr, Event event, int column, float column_width,
 
 void draw_event_duration(cairo_t *cr, Event event, int column,
                          float column_width, float y) {
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                         CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, 10);
+
   int duration = event.duration.seconds;
   char t[6];
   snprintf(t, 6, "%02d:%02d", duration / 3600, (duration % 3600) / 60);
@@ -222,5 +230,28 @@ void draw_overlap_indicator(cairo_t *cr, int i, int idx, int overlap) {
 
 void draw_column_events(cairo_t *cr, int i, bool draw_selected_event) {
   for (int j = 0; j < n_events; j++) {
+    Event event = events[j];
+
+    if (draw_selected_event && selected_event != j) {
+      continue;
+    }
+
+    float hue = string_to_hue(event.name);
+    if (selected_event == j) {
+      cairo_set_source_hsva(cr, hue, 0.1, 0.8, 0.9);
+    } else {
+      cairo_set_source_hsva(cr, hue, 0.1, 0.9, 0.9);
+    }
+
+    int day_start_time = get_start_of_week() + i * 24 * 60 * 60;
+    if (event.start.epoch >= day_start_time &&
+        event.start.epoch < day_start_time + 24 * 60 * 60) {
+      draw_event(cr, event, i);
+    }
+
+    int overlap = event_has_overlap(j);
+    if (overlap != -1) {
+      draw_overlap_indicator(cr, i, j, overlap);
+    }
   }
 }
