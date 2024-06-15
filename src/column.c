@@ -131,6 +131,15 @@ void draw_event(cairo_t *cr, Event event, int column) {
   draw_event_duration(cr, event, column, column_width, y);
 }
 
+float string_to_hue(char *s) {
+  int sum = 0;
+  for (size_t i = 0; i < strlen(s); i++) {
+    sum += s[i];
+  }
+
+  return (float)(sum % 360) / 360;
+}
+
 bool check_if_ranges_overlap(int start_time1, int end_time1, int start_time2,
                              int end_time2) {
   if (start_time1 >= start_time2 && start_time1 < end_time2) {
@@ -183,12 +192,35 @@ Rect get_event_rect(Event event, float column_width, int column_height,
               column_height;
     float h = (float)event.duration.seconds / (24 * 60 * 60) * column_height;
 
-    draw_outlined_rectangle(cr, time_column_width + column * column_width + 5,
-                            y + header_height, column_width - 10, h);
+    return (Rect){time_column_width + column * column_width + 5,
+                  y + header_height, column_width - 10, h};
+  }
 
-    cairo_set_source_shade(cr, 0.2);
-    cairo_move_to(cr, time_column_width + column * column_width + 10,
-                  y + header_height + 12);
-    cairo_show_text(cr, event.name);
+  return (Rect){0, 0, 0, 0};
+}
+
+void draw_overlap_indicator(cairo_t *cr, int i, int idx, int overlap) {
+  float column_height = (float)height - header_height;
+  float column_width = (float)(width - time_column_width) / 7;
+  Event event = events[idx];
+  Event other = events[overlap];
+
+  Rect event_rect = get_event_rect(event, column_width, column_height, i);
+
+  Rect other_rect = get_event_rect(other, column_width, column_height, i);
+
+  cairo_set_source_hsva(cr, 0, 0.8, 0.8, 1.0);
+  cairo_set_line_width(cr, 3.0);
+  cairo_move_to(cr, event_rect.x, event_rect.y);
+  cairo_line_to(cr, event_rect.x, event_rect.y + event_rect.h);
+  cairo_stroke(cr);
+
+  cairo_move_to(cr, other_rect.x, other_rect.y);
+  cairo_line_to(cr, other_rect.x, other_rect.y + other_rect.h);
+  cairo_stroke(cr);
+}
+
+void draw_column_events(cairo_t *cr, int i, bool draw_selected_event) {
+  for (int j = 0; j < n_events; j++) {
   }
 }
