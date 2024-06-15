@@ -12,6 +12,7 @@ typedef struct Rect {
   float h;
 } Rect;
 
+void draw_column(cairo_t *cr, int i);
 Rect get_event_rect(Event event, float column_width, int column_height,
                     int column);
 

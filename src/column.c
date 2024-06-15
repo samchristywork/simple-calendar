@@ -255,3 +255,19 @@ void draw_column_events(cairo_t *cr, int i, bool draw_selected_event) {
     }
   }
 }
+
+void draw_column(cairo_t *cr, int i) {
+  char *days[] = {"Sunday",   "Monday", "Tuesday", "Wednesday",
+                  "Thursday", "Friday", "Saturday"};
+
+  char date[11];
+  time_t t = get_start_of_week() + i * 24 * 60 * 60;
+  struct tm tm = *localtime(&t);
+  strftime(date, 11, "%Y-%m-%d", &tm);
+  char *day = days[tm.tm_wday];
+  draw_column_header(cr, i, day, date);
+  draw_column_grids(cr, i);
+  draw_column_borders(cr, i);
+  draw_column_events(cr, i, false);
+  draw_column_events(cr, i, true);
+}
