@@ -152,12 +152,17 @@ void show_help_dialog() {
 
 gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
   (void)data;
-  if (event->keyval == GDK_KEY_q) {
+
+  char *binding = get_binding(event->keyval);
+
+  if (strcmp(binding, "unknown") == 0) {
+    g_print("Unknown key: %s\n", gdk_keyval_name(event->keyval));
+    free(binding);
+    return FALSE;
+  } else if (strcmp(binding, "quit") == 0) {
     // TODO: Ask if we want to save before quitting
     gtk_main_quit();
-  } else if (event->keyval == GDK_KEY_Escape) {
-    gtk_main_quit();
-  } else if (event->keyval == GDK_KEY_d) {
+  } else if (strcmp(binding, "delete-event") == 0) {
     if (selected_event != -1) {
       free(events[selected_event].name);
       for (int i = selected_event; i < n_events - 1; i++) {
@@ -166,8 +171,7 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
       n_events--;
       selected_event = -1;
     }
-    gtk_widget_queue_draw(widget);
-  } else if (event->keyval == GDK_KEY_o) {
+  } else if (strcmp(binding, "add-event") == 0) {
     char *name = ask_for_string("Event Name");
     if (name != NULL) {
       add_event(name,
@@ -177,70 +181,63 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
                 (Duration){60 * 60});
       selected_event = n_events - 1;
     }
-  } else if (event->keyval == GDK_KEY_s) {
+  } else if (strcmp(binding, "save") == 0) {
     serialize_events(filename);
-    gtk_widget_queue_draw(widget);
-  } else if (event->keyval == GDK_KEY_n) {
+  } else if (strcmp(binding, "next-event") == 0) {
     select_next_event(widget);
-  } else if (event->keyval == GDK_KEY_p) {
+  } else if (strcmp(binding, "previous-event") == 0) {
     select_previous_event(widget);
-  } else if (event->keyval == GDK_KEY_Up || event->keyval == GDK_KEY_k) {
+  } else if (strcmp(binding, "up") == 0) {
     if (selected_event != -1) {
       events[selected_event].start.epoch -= 60 * 30;
-      gtk_widget_queue_draw(widget);
     }
-  } else if (event->keyval == GDK_KEY_Down || event->keyval == GDK_KEY_j) {
+  } else if (strcmp(binding, "down") == 0) {
     if (selected_event != -1) {
       events[selected_event].start.epoch += 60 * 30;
-      gtk_widget_queue_draw(widget);
     }
-  } else if (event->keyval == GDK_KEY_Right || event->keyval == GDK_KEY_l) {
+  } else if (strcmp(binding, "right") == 0) {
     if (selected_event != -1) {
       events[selected_event].start.epoch += 24 * 60 * 60;
-      gtk_widget_queue_draw(widget);
     }
-  } else if (event->keyval == GDK_KEY_Left || event->keyval == GDK_KEY_h) {
+  } else if (strcmp(binding, "left") == 0) {
     if (selected_event != -1) {
       events[selected_event].start.epoch -= 24 * 60 * 60;
-      gtk_widget_queue_draw(widget);
     }
-  } else if (event->keyval == GDK_KEY_H) {
+  } else if (strcmp(binding, "previous_day") == 0) {
     day_offset--;
-    gtk_widget_queue_draw(widget);
-  } else if (event->keyval == GDK_KEY_L) {
+  } else if (strcmp(binding, "next_day") == 0) {
     day_offset++;
-    gtk_widget_queue_draw(widget);
-  } else if (event->keyval == GDK_KEY_c) {
+  } else if (strcmp(binding, "copy-event") == 0) {
     if (selected_event != -1) {
       add_event(events[selected_event].name, events[selected_event].start,
                 events[selected_event].duration);
     }
-  } else if (event->keyval == GDK_KEY_plus) {
+  } else if (strcmp(binding, "increase-duration") == 0) {
     if (selected_event != -1) {
       events[selected_event].duration.seconds += 60 * 30;
-      gtk_widget_queue_draw(widget);
     }
-  } else if (event->keyval == GDK_KEY_minus) {
+  } else if (strcmp(binding, "decrease-duration") == 0) {
     if (selected_event != -1) {
       events[selected_event].duration.seconds -= 60 * 30;
       if (events[selected_event].duration.seconds < 60 * 30) {
         events[selected_event].duration.seconds = 60 * 30;
       }
-      gtk_widget_queue_draw(widget);
     }
-  } else if (event->keyval == GDK_KEY_r) {
+  } else if (strcmp(binding, "rename-event") == 0) {
     if (selected_event != -1) {
       char *newName = ask_for_string("New Name");
       if (newName != NULL) {
         free(events[selected_event].name);
         events[selected_event].name = newName;
-        gtk_widget_queue_draw(widget);
       }
     }
-  } else if (event->keyval == GDK_KEY_question) {
-    show_help_menu();
+  } else if (strcmp(binding, "help") == 0) {
+    show_help_dialog();
   }
 
+  gtk_widget_queue_draw(widget);
+
+  free(binding);
   return FALSE;
 }
 
