@@ -268,4 +268,35 @@ gboolean handle_mouse_press(GtkWidget *widget, GdkEventButton *event,
     gtk_widget_queue_draw(widget);
   }
 
+  return TRUE;
+}
+
+gboolean handle_mouse_release(GtkWidget *widget, GdkEventButton *event,
+                              gpointer data) {
+  (void)data;
+  (void)widget;
+  if (event->button == 1 && event->type == GDK_BUTTON_RELEASE) {
+    g_print("Mouse left release at (%f, %f)\n", event->x, event->y);
+  }
+
+  return TRUE;
+}
+
+gboolean handle_mouse_drag(GtkWidget *widget, GdkEventMotion *event,
+                           gpointer data) {
+  (void)data;
+  if (selected_event != -1) {
+    CellPos c = get_cell(event->x, event->y);
+    int day_start_time = get_start_of_week() + c.column * 24 * 60 * 60;
+    events[selected_event].start.epoch = day_start_time + c.row * 60 * 60 / 2;
+
+    gtk_widget_queue_draw(widget);
+  }
+
+  return TRUE;
+}
+
+gboolean handle_refresh(gpointer data) {
+  gtk_widget_queue_draw(GTK_WIDGET(data));
+  return TRUE;
 }
