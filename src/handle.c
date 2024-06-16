@@ -16,6 +16,8 @@ extern int height;
 
 extern int day_offset;
 
+#define BIND(name) strcmp(binding, name) == 0
+
 typedef struct CellPos {
   int column;
   int row;
@@ -153,23 +155,23 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
 
   char *binding = get_binding(event->keyval);
 
-  if (strcmp(binding, "unknown") == 0) {
+  if (BIND("unknown")) {
     g_print("Unknown key: %s\n", gdk_keyval_name(event->keyval));
     free(binding);
     return FALSE;
-  } else if (strcmp(binding, "quit") == 0) {
+  } else if (BIND("quit")) {
     // TODO: Ask if we want to save before quitting
     gtk_main_quit();
-  } else if (strcmp(binding, "delete-event") == 0) {
-    if (selected_event != -1) {
-      free(events[selected_event].name);
-      for (int i = selected_event; i < n_events - 1; i++) {
-        events[i] = events[i + 1];
+  } else if (BIND("delete-event")) {
+    if (events.selected != -1) {
+      free(events.events[events.selected].name);
+      for (int i = events.selected; i < events.n - 1; i++) {
+        events.events[i] = events.events[i + 1];
       }
-      n_events--;
-      selected_event = -1;
+      events.n--;
+      events.selected = -1;
     }
-  } else if (strcmp(binding, "add-event") == 0) {
+  } else if (BIND("add-event")) {
     char *name = ask_for_string("Event Name");
     if (name != NULL) {
       add_event(name,
@@ -177,59 +179,60 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
                     time(NULL) / (60 * 60) * 60 * 60,
                 },
                 (Duration){60 * 60});
-      selected_event = n_events - 1;
+      events.selected = events.n - 1;
     }
-  } else if (strcmp(binding, "save") == 0) {
+  } else if (BIND("save")) {
     serialize_events(filename);
-  } else if (strcmp(binding, "next-event") == 0) {
+  } else if (BIND("next-event")) {
     select_next_event(widget);
-  } else if (strcmp(binding, "previous-event") == 0) {
+  } else if (BIND("previous-event")) {
     select_previous_event(widget);
-  } else if (strcmp(binding, "up") == 0) {
-    if (selected_event != -1) {
-      events[selected_event].start.epoch -= 60 * 30;
+  } else if (BIND("up")) {
+    if (events.selected != -1) {
+      events.events[events.selected].start.epoch -= 60 * 30;
     }
-  } else if (strcmp(binding, "down") == 0) {
-    if (selected_event != -1) {
-      events[selected_event].start.epoch += 60 * 30;
+  } else if (BIND("down")) {
+    if (events.selected != -1) {
+      events.events[events.selected].start.epoch += 60 * 30;
     }
-  } else if (strcmp(binding, "right") == 0) {
-    if (selected_event != -1) {
-      events[selected_event].start.epoch += 24 * 60 * 60;
+  } else if (BIND("right")) {
+    if (events.selected != -1) {
+      events.events[events.selected].start.epoch += 24 * 60 * 60;
     }
-  } else if (strcmp(binding, "left") == 0) {
-    if (selected_event != -1) {
-      events[selected_event].start.epoch -= 24 * 60 * 60;
+  } else if (BIND("left")) {
+    if (events.selected != -1) {
+      events.events[events.selected].start.epoch -= 24 * 60 * 60;
     }
-  } else if (strcmp(binding, "previous_day") == 0) {
+  } else if (BIND("previous-day")) {
     day_offset--;
-  } else if (strcmp(binding, "next_day") == 0) {
+  } else if (BIND("next-day")) {
     day_offset++;
-  } else if (strcmp(binding, "copy-event") == 0) {
-    if (selected_event != -1) {
-      add_event(events[selected_event].name, events[selected_event].start,
-                events[selected_event].duration);
+  } else if (BIND("copy-event")) {
+    if (events.selected != -1) {
+      add_event(events.events[events.selected].name,
+                events.events[events.selected].start,
+                events.events[events.selected].duration);
     }
-  } else if (strcmp(binding, "increase-duration") == 0) {
-    if (selected_event != -1) {
-      events[selected_event].duration.seconds += 60 * 30;
+  } else if (BIND("increase-duration")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds += 60 * 30;
     }
-  } else if (strcmp(binding, "decrease-duration") == 0) {
-    if (selected_event != -1) {
-      events[selected_event].duration.seconds -= 60 * 30;
-      if (events[selected_event].duration.seconds < 60 * 30) {
-        events[selected_event].duration.seconds = 60 * 30;
+  } else if (BIND("decrease-duration")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds -= 60 * 30;
+      if (events.events[events.selected].duration.seconds < 60 * 30) {
+        events.events[events.selected].duration.seconds = 60 * 30;
       }
     }
-  } else if (strcmp(binding, "rename-event") == 0) {
-    if (selected_event != -1) {
+  } else if (BIND("rename-event")) {
+    if (events.selected != -1) {
       char *newName = ask_for_string("New Name");
       if (newName != NULL) {
-        free(events[selected_event].name);
-        events[selected_event].name = newName;
+        free(events.events[events.selected].name);
+        events.events[events.selected].name = newName;
       }
     }
-  } else if (strcmp(binding, "help") == 0) {
+  } else if (BIND("help")) {
     show_help_dialog();
   }
 
