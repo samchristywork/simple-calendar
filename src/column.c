@@ -62,6 +62,18 @@ void draw_column_borders(cairo_t *cr, int i) {
   cairo_stroke(cr);
 }
 
+void draw_time_text(cairo_t *cr, int x, int y, int hour) {
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                         CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, 10);
+
+  char t[6];
+  snprintf(t, 6, "%02d:00", hour);
+  cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.2);
+  cairo_move_to(cr, x + 6, y - 3);
+  cairo_show_text(cr, t);
+}
+
 void draw_column_grids(cairo_t *cr, int i) {
   float column_width = (float)(width - time_column_width) / 7;
   float column_height = (float)height - header_height;
@@ -76,12 +88,15 @@ void draw_column_grids(cairo_t *cr, int i) {
     cairo_line_to(cr, x + column_width, y);
     cairo_stroke(cr);
 
-    y += column_height / 24 / 2;
+    int num_hours = events.end_hour - events.start_hour;
+    y += column_height / num_hours / 2;
     cairo_set_source_shade(cr, 0.8);
     cairo_set_line_width(cr, 0.5);
     cairo_move_to(cr, x, y);
     cairo_line_to(cr, x + column_width, y);
     cairo_stroke(cr);
+
+    draw_time_text(cr, x, y, j);
   }
 }
 
