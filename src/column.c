@@ -78,7 +78,7 @@ void draw_column_grids(cairo_t *cr, int i) {
   float column_width = (float)(width - time_column_width) / 7;
   float column_height = (float)height - header_height;
 
-  for (int j = 0; j < 24; j++) {
+  for (int j = events.start_hour; j < events.end_hour; j++) {
     int x = time_column_width + i * column_width;
     int y = hour_to_y_offset(j);
 
@@ -117,8 +117,7 @@ void draw_event_name(cairo_t *cr, Event event, int column, float column_width,
   cairo_set_font_size(cr, 10);
 
   cairo_set_source_shade(cr, 0.2);
-  cairo_move_to(cr, time_column_width + column * column_width + 10,
-                y + header_height + 12);
+  cairo_move_to(cr, time_column_width + column * column_width + 10, y + 12);
   cairo_show_text(cr, event.name);
 }
 
@@ -195,13 +194,13 @@ bool check_if_ranges_overlap(int start_time1, int end_time1, int start_time2,
 }
 
 int event_has_overlap(int idx) {
-  Event event = events[idx];
-  for (int i = 0; i < n_events; i++) {
+  Event event = events.events[idx];
+  for (int i = 0; i < events.n; i++) {
     if (i == idx) {
       continue;
     }
 
-    Event other = events[i];
+    Event other = events.events[i];
     int event_start_time = event.start.epoch;
     int event_end_time = event.start.epoch + event.duration.seconds;
     int other_start_time = other.start.epoch;
@@ -218,15 +217,17 @@ Rect get_event_rect(Event event, float column_width, int column_height,
                     int column) {
   int event_start_time = event.start.epoch;
 
-  int day_start_time = get_start_of_week() + column * 24 * 60 * 60;
+  int num_hours = events.end_hour - events.start_hour;
+  int day_start_time = get_start_of_week() + column * num_hours * 60 * 60;
   if (event_start_time >= day_start_time &&
       event_start_time < day_start_time + 24 * 60 * 60) {
-    float y = (float)(event_start_time - day_start_time) / (24 * 60 * 60) *
-              column_height;
-    float h = (float)event.duration.seconds / (24 * 60 * 60) * column_height;
+    float hour = (float)(event_start_time - day_start_time) / (60 * 60);
+    float y = hour_to_y_offset(hour);
+    float h =
+        (float)event.duration.seconds / (num_hours * 60 * 60) * column_height;
 
-    return (Rect){time_column_width + column * column_width + 5,
-                  y + header_height, column_width - 10, h};
+    return (Rect){time_column_width + column * column_width + 5, y,
+                  column_width - 10, h};
   }
 
   return (Rect){0, 0, 0, 0};
@@ -235,8 +236,8 @@ Rect get_event_rect(Event event, float column_width, int column_height,
 void draw_overlap_indicator(cairo_t *cr, int i, int idx, int overlap) {
   float column_height = (float)height - header_height;
   float column_width = (float)(width - time_column_width) / 7;
-  Event event = events[idx];
-  Event other = events[overlap];
+  Event event = events.events[idx];
+  Event other = events.events[overlap];
 
   Rect event_rect = get_event_rect(event, column_width, column_height, i);
 
@@ -254,18 +255,18 @@ void draw_overlap_indicator(cairo_t *cr, int i, int idx, int overlap) {
 }
 
 void draw_column_events(cairo_t *cr, int i, bool draw_selected_event) {
-  for (int j = 0; j < n_events; j++) {
-    Event event = events[j];
+  for (int j = 0; j < events.n; j++) {
+    Event event = events.events[j];
 
-    if (draw_selected_event && selected_event != j) {
+    if (draw_selected_event && events.selected != j) {
       continue;
     }
 
     float hue = string_to_hue(event.name);
-    if (selected_event == j) {
-      cairo_set_source_hsva(cr, hue, 0.1, 0.8, 0.9);
+    if (events.selected == j) {
+      cairo_set_source_hsva(cr, hue, 0.1, 0.8, 0.8);
     } else {
-      cairo_set_source_hsva(cr, hue, 0.1, 0.9, 0.9);
+      cairo_set_source_hsva(cr, hue, 0.1, 0.9, 0.8);
     }
 
     int day_start_time = get_start_of_week() + i * 24 * 60 * 60;

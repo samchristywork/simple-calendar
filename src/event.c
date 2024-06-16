@@ -4,20 +4,19 @@
 
 #include "event.h"
 
-Event *events = NULL;
-int n_events = 0;
-int selected_event = -1;
+Events events = {
+    .events = NULL, .n = 0, .selected = -1, .start_hour = 0, .end_hour = 24};
 
 void add_event(char *name, DateTime start, Duration duration) {
-  if (events == NULL) {
-    events = malloc(sizeof(Event));
-    n_events = 1;
+  if (events.events == NULL) {
+    events.events = malloc(sizeof(Event));
+    events.n = 1;
   } else {
-    events = realloc(events, (n_events + 1) * sizeof(Event));
-    n_events++;
+    events.events = realloc(events.events, (events.n + 1) * sizeof(Event));
+    events.n++;
   }
 
-  Event *e = &events[n_events - 1];
+  Event *e = &events.events[events.n - 1];
   e->name = strdup(name);
   e->start = start;
   e->duration = duration;

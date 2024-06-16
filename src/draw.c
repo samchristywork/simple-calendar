@@ -9,6 +9,8 @@ extern time_t current_time;
 extern int width;
 extern int height;
 
+extern Events events;
+
 int header_height = 50;
 int time_column_width = 50;
 int day_offset = 0;
@@ -53,8 +55,7 @@ void draw_current_time(cairo_t *cr) {
                        60;
 
   float x = time_column_width + current_day * column_width;
-  float y = header_height + current_hour * column_height / 24 +
-            current_minute * column_height / 24 / 60;
+  float y = hour_to_y_offset(current_hour + (float)current_minute / 60);
 
   cairo_set_source_shade(cr, 0.0);
   cairo_set_line_width(cr, 2.0);
@@ -68,7 +69,8 @@ void draw_current_time(cairo_t *cr) {
   cairo_text_extents(cr, time_str, &extents);
 
   cairo_move_to(cr, x + column_width - extents.width - 10,
-                y + column_height / 24 / 2 - 2);
+                y + column_height / (events.end_hour - events.start_hour) / 2 -
+                    2);
   cairo_show_text(cr, time_str);
   free(time_str);
 }
@@ -87,9 +89,10 @@ void draw_time_column(cairo_t *cr) {
 
   cairo_set_source_shade(cr, 0.2);
   cairo_set_line_width(cr, 0.5);
-  for (int i = 0; i < 24; i++) {
+  for (int i = events.start_hour; i < events.end_hour; i++) {
     int x = 0;
-    int y = header_height + i * column_height / 24;
+    int y = header_height + (i - events.start_hour) * column_height /
+                                (events.end_hour - events.start_hour);
     cairo_move_to(cr, x, y);
     cairo_line_to(cr, x + column_width, y);
     cairo_stroke(cr);
@@ -100,8 +103,10 @@ void draw_time_column(cairo_t *cr) {
     cairo_text_extents_t extents;
     cairo_text_extents(cr, time, &extents);
 
-    cairo_move_to(cr, x + column_width / 2 - extents.width / 2,
-                  y + column_height / 24 / 2 + extents.height / 2);
+    cairo_move_to(
+        cr, x + column_width / 2 - extents.width / 2,
+        y + column_height / (events.end_hour - events.start_hour) / 2 +
+            extents.height / 2);
     cairo_show_text(cr, time);
   }
 }

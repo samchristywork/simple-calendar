@@ -15,6 +15,14 @@ typedef struct Event {
   Duration duration;
 } Event;
 
+typedef struct Events {
+  Event *events;
+  int n;
+  int selected;
+  float start_hour;
+  float end_hour;
+} Events;
+
 void add_event(char *name, DateTime start, Duration duration);
 
 #endif

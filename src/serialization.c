@@ -7,8 +7,7 @@
 
 #include "event.h"
 
-extern Event *events;
-extern int n_events;
+extern Events events;
 
 char *file_contents = NULL;
 
@@ -61,8 +60,8 @@ char *serialize_events_to_string() {
   char *buffer = malloc(1);
   buffer[0] = '\0';
 
-  for (int i = 0; i < n_events; i++) {
-    Event event = events[i];
+  for (int i = 0; i < events.n; i++) {
+    Event event = events.events[i];
     char *line = NULL;
     asprintf(&line, "%d	%d	%s\n", event.start.epoch,
              event.duration.seconds / 60, event.name);

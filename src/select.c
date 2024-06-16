@@ -2,20 +2,18 @@
 
 #include "event.h"
 
-extern int selected_event;
-extern Event *events;
-extern int n_events;
+extern Events events;
 
 void select_next_event(GtkWidget *widget) {
   int lowerTimeBound = time(NULL);
-  if (selected_event != -1) {
-    lowerTimeBound = events[selected_event].start.epoch;
+  if (events.selected != -1) {
+    lowerTimeBound = events.events[events.selected].start.epoch;
   }
 
   int lowestEventIdx = -1;
   int lowestEventTime = INT_MAX;
-  for (int i = 0; i < n_events; i++) {
-    Event event = events[i];
+  for (int i = 0; i < events.n; i++) {
+    Event event = events.events[i];
     if (event.start.epoch > lowerTimeBound &&
         event.start.epoch < lowestEventTime) {
       lowestEventTime = event.start.epoch;
@@ -24,7 +22,7 @@ void select_next_event(GtkWidget *widget) {
   }
 
   if (lowestEventIdx != -1) {
-    selected_event = lowestEventIdx;
+    events.selected = lowestEventIdx;
   }
 
   gtk_widget_queue_draw(widget);
@@ -32,14 +30,14 @@ void select_next_event(GtkWidget *widget) {
 
 void select_previous_event(GtkWidget *widget) {
   int upperTimeBound = time(NULL);
-  if (selected_event != -1) {
-    upperTimeBound = events[selected_event].start.epoch;
+  if (events.selected != -1) {
+    upperTimeBound = events.events[events.selected].start.epoch;
   }
 
   int highestEventIdx = -1;
   int highestEventTime = INT_MIN;
-  for (int i = 0; i < n_events; i++) {
-    Event event = events[i];
+  for (int i = 0; i < events.n; i++) {
+    Event event = events.events[i];
     if (event.start.epoch < upperTimeBound &&
         event.start.epoch > highestEventTime) {
       highestEventTime = event.start.epoch;
@@ -48,7 +46,7 @@ void select_previous_event(GtkWidget *widget) {
   }
 
   if (highestEventIdx != -1) {
-    selected_event = highestEventIdx;
+    events.selected = highestEventIdx;
   }
 
   gtk_widget_queue_draw(widget);

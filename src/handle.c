@@ -6,9 +6,7 @@
 
 extern char *filename;
 
-extern Event *events;
-extern int n_events;
-extern int selected_event;
+extern Events events;
 
 extern int time_column_width;
 extern int header_height;
@@ -92,8 +90,8 @@ char *get_binding(guint keyval) {
 int get_event(float x, float y) {
   float column_width = (float)(width - time_column_width) / 7;
   CellPos c = get_cell(x, y);
-  for (int i = 0; i < n_events; i++) {
-    Event event = events[i];
+  for (int i = 0; i < events.n; i++) {
+    Event event = events.events[i];
     float column_height = (float)height - header_height;
     Rect event_rect =
         get_event_rect(event, column_width, column_height, c.column);
@@ -249,18 +247,18 @@ gboolean handle_mouse_press(GtkWidget *widget, GdkEventButton *event,
     CellPos c = get_cell(event->x, event->y);
     g_print("Cell: (%d, %d)\n", c.column, c.row);
 
-    int EventIdx = get_event(event->x, event->y);
-    g_print("Event: %d\n", EventIdx);
-    selected_event = EventIdx;
+    int idx = get_event(event->x, event->y);
+    g_print("Event: %d\n", idx);
+    events.selected = idx;
 
-    if (selected_event == -1) {
+    if (events.selected == -1) {
       char *name = ask_for_string("Event Name");
       if (name != NULL) {
         add_event(name,
                   (DateTime){get_start_of_week() + c.column * 24 * 60 * 60 +
                              c.row * 60 * 60 / 2},
                   (Duration){60 * 60});
-        selected_event = n_events - 1;
+        events.selected = events.n - 1;
       }
     }
 
@@ -284,10 +282,11 @@ gboolean handle_mouse_release(GtkWidget *widget, GdkEventButton *event,
 gboolean handle_mouse_drag(GtkWidget *widget, GdkEventMotion *event,
                            gpointer data) {
   (void)data;
-  if (selected_event != -1) {
+  if (events.selected != -1) {
     CellPos c = get_cell(event->x, event->y);
     int day_start_time = get_start_of_week() + c.column * 24 * 60 * 60;
-    events[selected_event].start.epoch = day_start_time + c.row * 60 * 60 / 2;
+    events.events[events.selected].start.epoch =
+        day_start_time + c.row * 60 * 60 / 2;
 
     gtk_widget_queue_draw(widget);
   }
