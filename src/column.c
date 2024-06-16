@@ -10,10 +10,13 @@ extern int height;
 extern int time_column_width;
 extern int header_height;
 
-// TODO: Turn this into a single struct
-extern Event *events;
-extern int n_events;
-extern int selected_event;
+extern Events events;
+
+float hour_to_y_offset(float hour) {
+  int num_hours = events.end_hour - events.start_hour;
+  return header_height +
+         (hour - events.start_hour) / num_hours * (height - header_height);
+}
 
 void draw_column_header(cairo_t *cr, int i, char *text, char *subtext) {
   cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
@@ -65,7 +68,7 @@ void draw_column_grids(cairo_t *cr, int i) {
 
   for (int j = 0; j < 24; j++) {
     int x = time_column_width + i * column_width;
-    int y = header_height + j * column_height / 24;
+    int y = hour_to_y_offset(j);
 
     cairo_set_source_shade(cr, 0.5);
     cairo_set_line_width(cr, 0.5);
@@ -120,7 +123,7 @@ void draw_event_duration(cairo_t *cr, Event event, int column,
 
   cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.4);
   cairo_move_to(cr, justify + time_column_width + column * column_width + 10,
-                y + header_height + 12);
+                y + 12);
   cairo_show_text(cr, t);
 }
 
@@ -128,12 +131,19 @@ void draw_event(cairo_t *cr, Event event, int column) {
   int day_start_time = get_start_of_week() + column * 24 * 60 * 60;
   float column_height = (float)height - header_height;
   float column_width = (float)(width - time_column_width) / 7;
-  float y = (float)(event.start.epoch - day_start_time) / (24 * 60 * 60) *
-            column_height;
-  float h = (float)event.duration.seconds / (24 * 60 * 60) * column_height;
+  float hour = (float)(event.start.epoch - day_start_time) / (60 * 60);
+  float y = hour_to_y_offset(hour);
+  int num_hours = events.end_hour - events.start_hour;
+  float h =
+      (float)event.duration.seconds / (num_hours * 60 * 60) * column_height;
 
-  draw_outlined_rectangle(cr, time_column_width + column * column_width + 5,
-                          y + header_height, column_width - 10, h);
+  if (y < header_height) {
+    h -= header_height - y;
+    y = header_height;
+  }
+
+  draw_outlined_rectangle(cr, time_column_width + column * column_width + 5, y,
+                          column_width - 10, h);
 
   draw_event_name(cr, event, column, column_width, y);
   draw_event_duration(cr, event, column, column_width, y);
