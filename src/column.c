@@ -9,6 +9,7 @@ extern int height;
 
 extern int time_column_width;
 extern int header_height;
+extern int num_days;
 
 extern Events events;
 
@@ -23,7 +24,7 @@ void draw_column_header(cairo_t *cr, int i, char *text, char *subtext) {
                          CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 16);
 
-  float column_width = (float)(width - time_column_width) / 7;
+  float column_width = (float)(width - time_column_width) / num_days;
   cairo_set_source_shade(cr, 0.9);
   cairo_rectangle(cr, time_column_width + i * column_width, 0, column_width,
                   header_height);
@@ -49,7 +50,7 @@ void draw_column_header(cairo_t *cr, int i, char *text, char *subtext) {
 }
 
 void draw_column_borders(cairo_t *cr, int i) {
-  float column_width = (float)(width - time_column_width) / 7;
+  float column_width = (float)(width - time_column_width) / num_days;
   cairo_set_source_shade(cr, 0.2);
   cairo_set_line_width(cr, 0.5);
 
@@ -75,7 +76,7 @@ void draw_time_text(cairo_t *cr, int x, int y, int hour) {
 }
 
 void draw_column_grids(cairo_t *cr, int i) {
-  float column_width = (float)(width - time_column_width) / 7;
+  float column_width = (float)(width - time_column_width) / num_days;
   float column_height = (float)height - header_height;
 
   for (int j = events.start_hour; j < events.end_hour; j++) {
@@ -144,7 +145,7 @@ void draw_event_duration(cairo_t *cr, Event event, int column,
 void draw_event(cairo_t *cr, Event event, int column) {
   int day_start_time = get_start_of_week() + column * 24 * 60 * 60;
   float column_height = (float)height - header_height;
-  float column_width = (float)(width - time_column_width) / 7;
+  float column_width = (float)(width - time_column_width) / num_days;
   float hour = (float)(event.start.epoch - day_start_time) / (60 * 60);
   float y = hour_to_y_offset(hour);
   int num_hours = events.end_hour - events.start_hour;
@@ -235,7 +236,7 @@ Rect get_event_rect(Event event, float column_width, int column_height,
 
 void draw_overlap_indicator(cairo_t *cr, int i, int idx, int overlap) {
   float column_height = (float)height - header_height;
-  float column_width = (float)(width - time_column_width) / 7;
+  float column_width = (float)(width - time_column_width) / num_days;
   Event event = events.events[idx];
   Event other = events.events[overlap];
 

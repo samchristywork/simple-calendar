@@ -21,6 +21,7 @@ char *filename;
 
 int width = 1400;
 int height = 800;
+int num_days = 7;
 
 int main(int argc, char *argv[]) {
   add_arg('f', "filename", "The file to read and write events to",

@@ -9,6 +9,7 @@ extern Events events;
 
 extern int time_column_width;
 extern int header_height;
+extern int num_days;
 
 extern int width;
 extern int height;
@@ -25,14 +26,15 @@ CellPos get_cell(float x, float y) {
     return c;
   }
 
-  c.column = (x - time_column_width) / ((float)(width - time_column_width) / 7);
+  c.column =
+      (x - time_column_width) / ((float)(width - time_column_width) / num_days);
   c.row = 2 * (y - header_height) / ((float)height - header_height) * 24;
 
   return c;
 }
 
 int get_event(float x, float y) {
-  float column_width = (float)(width - time_column_width) / 7;
+  float column_width = (float)(width - time_column_width) / num_days;
   CellPos c = get_cell(x, y);
   for (int i = 0; i < events.n; i++) {
     Event event = events.events[i];

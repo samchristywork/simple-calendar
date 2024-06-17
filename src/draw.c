@@ -8,6 +8,7 @@ extern time_t current_time;
 
 extern int width;
 extern int height;
+extern int num_days;
 
 extern Events events;
 
@@ -42,7 +43,7 @@ void draw_modified_indicator(cairo_t *cr) {
 }
 
 void draw_current_time(cairo_t *cr) {
-  float column_width = (float)(width - time_column_width) / 7;
+  float column_width = (float)(width - time_column_width) / num_days;
   float column_height = (float)height - header_height;
 
   time_t current_time = time(NULL);
@@ -117,7 +118,7 @@ void draw(cairo_t *cr) {
 
   draw_modified_indicator(cr);
   draw_time_column(cr);
-  for (int i = 0; i < 7; i++) {
+  for (int i = 0; i < num_days; i++) {
     draw_column(cr, i);
   }
 
