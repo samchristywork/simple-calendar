@@ -28,10 +28,12 @@ int main(int argc, char *argv[]) {
           ARG_REQUIRED);
   add_arg('h', "help", "Show this help message", ARG_NONE);
   add_arg('v', "version", "Show the version number and license info", ARG_NONE);
+  add_arg('n', "days", "The number of days to show", ARG_REQUIRED);
 
   bool help = get_arg_bool(argc, argv, 'h', false);
   bool version = get_arg_bool(argc, argv, 'v', false);
   filename = get_arg_string(argc, argv, 'f', "./calendar.txt");
+  num_days = get_arg_int(argc, argv, 'n', 7);
 
   if (version) {
     printf("%s\n\n%s\n", VERSION_STRING, LICENSE_STRING);
