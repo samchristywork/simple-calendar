@@ -34,8 +34,16 @@ Binding bindings[] = {
     {GDK_KEY_p, "previous-event", "Previous Event"},
     {GDK_KEY_c, "copy-event", "Copy Event"},
     {GDK_KEY_r, "rename-event", "Rename Event"},
-    {GDK_KEY_plus, "increase-duration", "Increase Duration"},
-    {GDK_KEY_minus, "decrease-duration", "Decrease Duration"},
+    {GDK_KEY_1, "duration_1", "Change duration to one hour"},
+    {GDK_KEY_2, "duration_2", "Change duration to two hours"},
+    {GDK_KEY_3, "duration_3", "Change duration to three hours"},
+    {GDK_KEY_4, "duration_4", "Change duration to four hours"},
+    {GDK_KEY_5, "duration_5", "Change duration to five hours"},
+    {GDK_KEY_6, "duration_6", "Change duration to six hours"},
+    {GDK_KEY_7, "duration_7", "Change duration to seven hours"},
+    {GDK_KEY_8, "duration_8", "Change duration to eight hours"},
+    {GDK_KEY_9, "duration_9", "Change duration to nine hours"},
+    {GDK_KEY_0, "duration_10", "Change duration to ten hours"},
 
     {0, "", ""},
     {0, "", "Movement"},
@@ -200,6 +208,48 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
     }
   } else if (BIND("help")) {
     show_help_dialog();
+  } else if (BIND("duration_1")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 60 * 60;
+    }
+  } else if (BIND("duration_2")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 2 * 60 * 60;
+    }
+  } else if (BIND("duration_3")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 3 * 60 * 60;
+    }
+  } else if (BIND("duration_4")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 4 * 60 * 60;
+    }
+  } else if (BIND("duration_5")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 5 * 60 * 60;
+    }
+  } else if (BIND("duration_6")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 6 * 60 * 60;
+    }
+  } else if (BIND("duration_7")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 7 * 60 * 60;
+    }
+  } else if (BIND("duration_8")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 8 * 60 * 60;
+    }
+  } else if (BIND("duration_9")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 9 * 60 * 60;
+    }
+  } else if (BIND("duration_10")) {
+    if (events.selected != -1) {
+      events.events[events.selected].duration.seconds = 10 * 60 * 60;
+    }
+  } else {
+    g_print("Unknown binding: %s\n", binding);
   }
 
   gtk_widget_queue_draw(widget);
