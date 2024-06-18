@@ -132,7 +132,7 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
   char *binding = get_binding(event->keyval);
 
   if (BIND("unknown")) {
-    g_print("Unknown key: %s\n", gdk_keyval_name(event->keyval));
+    printf("Unknown key: %s\n", gdk_keyval_name(event->keyval));
     free(binding);
     return FALSE;
   } else if (BIND("quit")) {
@@ -251,7 +251,7 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
       events.events[events.selected].duration.seconds = 10 * 60 * 60;
     }
   } else {
-    g_print("Unknown binding: %s\n", binding);
+    printf("Unknown binding: %s\n", binding);
   }
 
   gtk_widget_queue_draw(widget);

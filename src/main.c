@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
   GdkDisplay *display = gdk_display_get_default();
   if (display == NULL) {
-    g_print("No display found.\n");
+    printf("No display found.\n");
     return -1;
   }
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   if (monitor == NULL) {
     monitor = gdk_display_get_monitor_at_point(display, 0, 0);
     if (monitor == NULL) {
-      g_print("No monitor found.\n");
+      printf("No monitor found.\n");
       return -1;
     }
   }

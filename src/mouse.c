@@ -62,12 +62,9 @@ gboolean handle_mouse_press(GtkWidget *widget, GdkEventButton *event,
   }
 
   if (event->button == 1 && event->type == GDK_BUTTON_PRESS) {
-    g_print("Mouse left click at (%f, %f)\n", event->x, event->y);
     CellPos c = get_cell(event->x, event->y);
-    g_print("Cell: (%d, %d)\n", c.column, c.row);
 
     int idx = get_event(event->x, event->y);
-    g_print("Event: %d\n", idx);
     events.selected = idx;
 
     if (events.selected == -1) {
@@ -89,11 +86,9 @@ gboolean handle_mouse_press(GtkWidget *widget, GdkEventButton *event,
 
 gboolean handle_mouse_release(GtkWidget *widget, GdkEventButton *event,
                               gpointer data) {
-  (void)data;
   (void)widget;
-  if (event->button == 1 && event->type == GDK_BUTTON_RELEASE) {
-    g_print("Mouse left release at (%f, %f)\n", event->x, event->y);
-  }
+  (void)event;
+  (void)data;
 
   return TRUE;
 }
