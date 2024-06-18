@@ -22,7 +22,9 @@ int get_start_of_week() {
   tm.tm_hour = 0;
   tm.tm_min = 0;
   tm.tm_sec = 0;
-  tm.tm_mday -= tm.tm_wday;
+  if (num_days == 7) {
+    tm.tm_mday -= tm.tm_wday;
+  }
   return mktime(&tm) + day_offset * 24 * 60 * 60;
 }
 
