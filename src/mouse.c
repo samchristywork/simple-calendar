@@ -53,6 +53,14 @@ int get_event(float x, float y) {
 gboolean handle_mouse_press(GtkWidget *widget, GdkEventButton *event,
                             gpointer data) {
   (void)data;
+  if (event->x < time_column_width || event->y < header_height) {
+    return TRUE;
+  }
+
+  if (event->x > width || event->y > height) {
+    return TRUE;
+  }
+
   if (event->button == 1 && event->type == GDK_BUTTON_PRESS) {
     g_print("Mouse left click at (%f, %f)\n", event->x, event->y);
     CellPos c = get_cell(event->x, event->y);
