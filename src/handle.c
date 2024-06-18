@@ -34,6 +34,8 @@ Binding bindings[] = {
     {GDK_KEY_p, "previous-event", "Previous Event"},
     {GDK_KEY_c, "copy-event", "Copy Event"},
     {GDK_KEY_r, "rename-event", "Rename Event"},
+    {GDK_KEY_plus, "increase-duration", "Increase Duration"},
+    {GDK_KEY_minus, "decrease-duration", "Decrease Duration"},
     {GDK_KEY_1, "duration_1", "Change duration to one hour"},
     {GDK_KEY_2, "duration_2", "Change duration to two hours"},
     {GDK_KEY_3, "duration_3", "Change duration to three hours"},
