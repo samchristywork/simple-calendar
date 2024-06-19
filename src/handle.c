@@ -131,6 +131,13 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
 
   char *binding = get_binding(event->keyval);
 
+  Event *e;
+  if (events.selected != -1) {
+    e = &events.events[events.selected];
+  } else {
+    e = NULL;
+  }
+
   if (BIND("unknown")) {
     printf("Unknown key: %s\n", gdk_keyval_name(event->keyval));
     free(binding);
@@ -139,8 +146,8 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
     // TODO: Ask if we want to save before quitting
     gtk_main_quit();
   } else if (BIND("delete-event")) {
-    if (events.selected != -1) {
-      free(events.events[events.selected].name);
+    if (e) {
+      free(e->name);
       for (int i = events.selected; i < events.n - 1; i++) {
         events.events[i] = events.events[i + 1];
       }
@@ -164,20 +171,20 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
   } else if (BIND("previous-event")) {
     select_previous_event(widget);
   } else if (BIND("up")) {
-    if (events.selected != -1) {
-      events.events[events.selected].start.epoch -= 60 * 30;
+    if (e) {
+      e->start.epoch -= 60 * 30;
     }
   } else if (BIND("down")) {
-    if (events.selected != -1) {
-      events.events[events.selected].start.epoch += 60 * 30;
+    if (e) {
+      e->start.epoch += 60 * 30;
     }
   } else if (BIND("right")) {
     if (events.selected != -1) {
-      events.events[events.selected].start.epoch += 24 * 60 * 60;
+      e->start.epoch += 24 * 60 * 60;
     }
   } else if (BIND("left")) {
     if (events.selected != -1) {
-      events.events[events.selected].start.epoch -= 24 * 60 * 60;
+      e->start.epoch -= 24 * 60 * 60;
     }
   } else if (BIND("previous-day")) {
     day_offset--;
@@ -185,70 +192,68 @@ gboolean handle_key(GtkWidget *widget, GdkEventKey *event, gpointer data) {
     day_offset++;
   } else if (BIND("copy-event")) {
     if (events.selected != -1) {
-      add_event(events.events[events.selected].name,
-                events.events[events.selected].start,
-                events.events[events.selected].duration);
+      add_event(e->name, e->start, e->duration);
     }
   } else if (BIND("increase-duration")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds += 60 * 30;
+      e->duration.seconds += 60 * 30;
     }
   } else if (BIND("decrease-duration")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds -= 60 * 30;
-      if (events.events[events.selected].duration.seconds < 60 * 30) {
-        events.events[events.selected].duration.seconds = 60 * 30;
+      e->duration.seconds -= 60 * 30;
+      if (e->duration.seconds < 60 * 30) {
+        e->duration.seconds = 60 * 30;
       }
     }
   } else if (BIND("rename-event")) {
     if (events.selected != -1) {
       char *newName = ask_for_string("New Name");
       if (newName != NULL) {
-        free(events.events[events.selected].name);
-        events.events[events.selected].name = newName;
+        free(e->name);
+        e->name = newName;
       }
     }
   } else if (BIND("help")) {
     show_help_dialog();
   } else if (BIND("duration_1")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 60 * 60;
+      e->duration.seconds = 60 * 60;
     }
   } else if (BIND("duration_2")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 2 * 60 * 60;
+      e->duration.seconds = 2 * 60 * 60;
     }
   } else if (BIND("duration_3")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 3 * 60 * 60;
+      e->duration.seconds = 3 * 60 * 60;
     }
   } else if (BIND("duration_4")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 4 * 60 * 60;
+      e->duration.seconds = 4 * 60 * 60;
     }
   } else if (BIND("duration_5")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 5 * 60 * 60;
+      e->duration.seconds = 5 * 60 * 60;
     }
   } else if (BIND("duration_6")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 6 * 60 * 60;
+      e->duration.seconds = 6 * 60 * 60;
     }
   } else if (BIND("duration_7")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 7 * 60 * 60;
+      e->duration.seconds = 7 * 60 * 60;
     }
   } else if (BIND("duration_8")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 8 * 60 * 60;
+      e->duration.seconds = 8 * 60 * 60;
     }
   } else if (BIND("duration_9")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 9 * 60 * 60;
+      e->duration.seconds = 9 * 60 * 60;
     }
   } else if (BIND("duration_10")) {
     if (events.selected != -1) {
-      events.events[events.selected].duration.seconds = 10 * 60 * 60;
+      e->duration.seconds = 10 * 60 * 60;
     }
   } else {
     printf("Unknown binding: %s\n", binding);
