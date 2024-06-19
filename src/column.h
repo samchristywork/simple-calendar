@@ -15,6 +15,5 @@ typedef struct Rect {
 void draw_column(cairo_t *cr, int i);
 Rect get_event_rect(Event event, float column_width, int column_height,
                     int column);
-float hour_to_y_offset(float hour);
 
 #endif

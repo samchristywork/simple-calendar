@@ -1,6 +1,8 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include <gtk/gtk.h>
+
 typedef struct {
   int epoch;
 } DateTime;
@@ -24,5 +26,7 @@ typedef struct Events {
 } Events;
 
 void add_event(char *name, DateTime start, Duration duration);
+void draw_event(cairo_t *cr, Event event, int column);
+float hour_to_y_offset(float hour);
 
 #endif
